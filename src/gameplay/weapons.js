@@ -187,7 +187,8 @@ class WeaponSystem {
       shotgun: this.weapon.shotgun,
       size: this.weapon.bulletSize,
       ricochet: this.weapon.ricochet,
-      ricochetsLeft: this.weapon.ricochetsLeft
+      ricochetsLeft: this.weapon.ricochetsLeft,
+      homingPhase: Math.random() * Math.PI * 2
     });
   }
 
