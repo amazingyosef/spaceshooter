@@ -50,14 +50,8 @@ class UpgradeSystem {
       {
         name: 'SHOTGUN BLAST',
         desc: 'Wide 8-pellet spread',
-        ok: () => !w.shotgun && !w.laser,
+        ok: () => !w.shotgun,
         apply: () => { w.shotgun = true; w.type = 'single'; }
-      },
-      {
-        name: 'LASER BEAM',
-        desc: 'Continuous damage beam',
-        ok: () => !w.laser && !w.shotgun,
-        apply: () => { w.laser = true; w.type = 'single'; }
       },
       {
         name: 'RAPID FIRE',

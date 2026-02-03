@@ -381,10 +381,6 @@ function sfx(name) {
       beep(500, 'sine', 0.08, 0.08);
       beep(400, 'sine', 0.06, 0.10, 0.02);
       break;
-    case 'laser':
-      beep(800, 'sine', 0.05, 0.15);
-      beep(1200, 'sine', 0.03, 0.20, 0.02);
-      break;
     case 'shotgun':
       beep(120, 'square', 0.08, 0.08);
       beep(80, 'square', 0.05, 0.10, 0.01);
