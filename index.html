@@ -16,7 +16,20 @@
   <script src="src/config.js"></script>     <!-- Game constants and data -->
   <script src="src/utils.js"></script>      <!-- Utility functions -->
   <script src="src/systems.js"></script>    <!-- Persistence & achievements -->
-  <script src="src/scenes.js"></script>     <!-- All game scenes -->
+
+  <!-- Gameplay Systems -->
+  <script src="src/gameplay/player.js"></script>    <!-- Player movement & damage -->
+  <script src="src/gameplay/weapons.js"></script>   <!-- Weapon firing & bullets -->
+  <script src="src/gameplay/enemies.js"></script>   <!-- Enemy spawning & AI -->
+  <script src="src/gameplay/upgrades.js"></script>  <!-- Upgrade system -->
+  <script src="src/gameplay/effects.js"></script>   <!-- Particles & pickups -->
+
+  <!-- Game Scenes -->
+  <script src="src/scenes/MenuScene.js"></script>         <!-- Main menu -->
+  <script src="src/scenes/AchievementsScene.js"></script> <!-- Achievements -->
+  <script src="src/scenes/GameScene.js"></script>         <!-- Main gameplay -->
+  <script src="src/scenes/GameOverScene.js"></script>     <!-- Game over -->
+
   <script src="src/main.js"></script>       <!-- Game initialization -->
 </body>
 </html>
