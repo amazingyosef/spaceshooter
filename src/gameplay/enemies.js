@@ -10,6 +10,7 @@ class EnemySystem {
   constructor(scene) {
     this.scene = scene;
     this.enemies = [];
+    this.sniperWarnings = [];
   }
 
   /**
@@ -263,6 +264,15 @@ class EnemySystem {
       e.x = clamp(e.x, 30, W - 30);
       e.y = clamp(e.y, 30, H - 30);
     }
+
+    // Update sniper warnings
+    for (let i = this.sniperWarnings.length - 1; i >= 0; i--) {
+      const sw = this.sniperWarnings[i];
+      sw.t -= dt;
+      if (sw.t <= 0) {
+        this.sniperWarnings.splice(i, 1);
+      }
+    }
   }
 
   // ... (continued in next part due to length)
@@ -287,6 +297,13 @@ class EnemySystem {
       if (!e.charging && d >= e.minRange) {
         e.charging = true;
         e.chargeT = 0;
+        // Create warning indicator
+        this.sniperWarnings.push({
+          x: player.x,
+          y: player.y,
+          t: e.chargeDur,
+          enemy: e
+        });
       }
       if (e.charging) {
         e.chargeT += dt;

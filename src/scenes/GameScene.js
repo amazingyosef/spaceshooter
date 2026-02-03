@@ -340,7 +340,7 @@ class GameScene extends Phaser.Scene {
 
   showUpgradeScreen() {
     this.upgradeMode = true;
-    this.upgrades = this.upgradeSystem.getUpgradePool(this.w, this.p, this.stats);
+    this.upgrades = this.upgradeSystem.getPool(this.w, this.p, this.stats);
     this.txtUpTitle.setVisible(true);
     this.txtUpSub.setVisible(true);
   }
@@ -426,6 +426,31 @@ class GameScene extends Phaser.Scene {
     this.time.delayedCall(2500, () => {
       this.scene.start('GameOver');
     });
+  }
+
+  // Wrapper methods for systems to call
+  spawnGravityWell(x, y) {
+    this.weaponSystem.spawnGravityWell(x, y);
+  }
+
+  burst(x, y, color, count, speed) {
+    this.effectsSystem.burst(x, y, color, count, speed);
+  }
+
+  shake(amt, dur) {
+    this.effectsSystem.shake(amt, dur);
+  }
+
+  explodeMega(x, y, dmg) {
+    const damage = this.effectsSystem.explodeMega(
+      x, y, dmg,
+      this.enemySystem.enemies,
+      this.p,
+      this.wave
+    );
+    if (damage > 0 && this.playerSystem.takeDamage(damage)) {
+      this.die();
+    }
   }
 
   draw() {
@@ -656,7 +681,7 @@ class GameScene extends Phaser.Scene {
     }
 
     // Draw enemy bullets
-    for (const eb of this.weaponSystem.eBullets) {
+    for (const eb of this.weaponSystem.enemyBullets) {
       this.gBu.fillStyle(0xff3333, 0.85);
       this.gBu.beginPath();
       this.gBu.arc(eb.x, eb.y, 5, 0, Math.PI * 2);
@@ -666,21 +691,22 @@ class GameScene extends Phaser.Scene {
     }
 
     // Draw laser beam
-    if (this.weaponSystem.laserActive && this.weaponSystem.laserChargeT > 0.1) {
-      const laserData = this.weaponSystem.getLaserBeam(this.p);
-      if (laserData) {
-        this.gBu.lineStyle(8, 0xff0088, 0.3);
-        this.gBu.beginPath();
-        this.gBu.moveTo(laserData.startX, laserData.startY);
-        this.gBu.lineTo(laserData.endX, laserData.endY);
-        this.gBu.strokePath();
+    if (this.weaponSystem.laserActive && this.weaponSystem.laserCharge >= 0.1) {
+      const range = 600;
+      const x2 = this.p.x + Math.cos(this.p.angle) * range;
+      const y2 = this.p.y + Math.sin(this.p.angle) * range;
 
-        this.gBu.lineStyle(3, 0xff44ff, 0.9);
-        this.gBu.beginPath();
-        this.gBu.moveTo(laserData.startX, laserData.startY);
-        this.gBu.lineTo(laserData.endX, laserData.endY);
-        this.gBu.strokePath();
-      }
+      this.gBu.lineStyle(8, 0xff0088, 0.3);
+      this.gBu.beginPath();
+      this.gBu.moveTo(this.p.x, this.p.y);
+      this.gBu.lineTo(x2, y2);
+      this.gBu.strokePath();
+
+      this.gBu.lineStyle(3, 0xff44ff, 0.9);
+      this.gBu.beginPath();
+      this.gBu.moveTo(this.p.x, this.p.y);
+      this.gBu.lineTo(x2, y2);
+      this.gBu.strokePath();
     }
 
     // Draw particles
@@ -773,7 +799,31 @@ class GameScene extends Phaser.Scene {
 
     // Upgrade screen
     if (this.upgradeMode) {
-      this.upgradeSystem.draw(this.gUp, this.input.activePointer, this.upTexts);
+      // Draw dark overlay
+      this.gUp.fillStyle(0x000000, 0.85);
+      this.gUp.fillRect(0, 0, W, H);
+
+      // Draw upgrade cards
+      for (let i = 0; i < this.upgrades.length; i++) {
+        const ux = 190 + i * 240;
+        const uy = H / 2 + 60;
+
+        // Card background
+        this.gUp.fillStyle(0x001122, 0.9);
+        this.gUp.fillRect(ux, uy, 180, 240);
+
+        // Card border
+        this.gUp.lineStyle(2, 0x00ffff, 0.7);
+        this.gUp.strokeRect(ux, uy, 180, 240);
+
+        // Hover effect
+        const mx = this.input.activePointer.x;
+        const my = this.input.activePointer.y;
+        if (mx >= ux && mx <= ux + 180 && my >= uy && my <= uy + 240) {
+          this.gUp.fillStyle(0x00ffff, 0.1);
+          this.gUp.fillRect(ux, uy, 180, 240);
+        }
+      }
     }
   }
 }
