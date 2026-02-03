@@ -739,9 +739,10 @@ class GameScene extends Phaser.Scene {
       const ey = e.y + shakeY;
       const flashColor = e.hitFlash > 0 ? 0xffffff : e.color;
       const flashAlpha = e.hitFlash > 0 ? 1.0 : 0.75;
+      const isBossType = (e.type === 'boss' || e.type === 'boss2' || e.type === 'boss3' || e.type === 'miniboss');
 
       // Boss types
-      if (e.type === 'boss' || e.type === 'boss2' || e.type === 'boss3' || e.type === 'miniboss') {
+      if (isBossType) {
         this.gEn.fillStyle(flashColor, flashAlpha);
         this.gEn.beginPath();
         this.gEn.arc(ex, ey, e.size, 0, Math.PI * 2);
@@ -835,15 +836,20 @@ class GameScene extends Phaser.Scene {
         this.gEn.fillPath();
         this.gEn.lineStyle(2, e.glow, 0.75);
         this.gEn.strokePath();
-        this.gEn.lineStyle(3, 0x33ccff, 0.6 + Math.sin(t * 4) * 0.2);
-        this.gEn.beginPath();
+        const shieldAlpha = e.hitFlash > 0 ? 0.95 : 0.55 + Math.sin(t * 4) * 0.15;
+        const shieldRadius = e.size + 7;
+        const segments = 8;
+        const segArc = (Math.PI * 2) / segments;
+        const segFill = segArc * 0.6;
+        const activeSegments = Math.max(0, Math.ceil(segments * hpPct));
         const sa = e.shieldA || 0;
-        const arc = Math.PI * 0.7;
-        this.gEn.arc(ex, ey, e.size + 6, sa, sa + arc);
-        this.gEn.strokePath();
-        this.gEn.beginPath();
-        this.gEn.arc(ex, ey, e.size + 6, sa + Math.PI, sa + Math.PI + arc);
-        this.gEn.strokePath();
+        this.gEn.lineStyle(2, 0x33ccff, shieldAlpha);
+        for (let i = 0; i < activeSegments; i++) {
+          const segStart = sa + i * segArc;
+          this.gEn.beginPath();
+          this.gEn.arc(ex, ey, shieldRadius, segStart, segStart + segFill);
+          this.gEn.strokePath();
+        }
       }
       else {
         // Standard enemy
@@ -853,6 +859,17 @@ class GameScene extends Phaser.Scene {
         this.gEn.fillPath();
         this.gEn.lineStyle(2, e.glow, 0.8);
         this.gEn.strokePath();
+      }
+
+      if (!isBossType) {
+        const barW = Math.max(12, e.size * 1.4);
+        const barH = 2;
+        const barX = ex - barW / 2;
+        const barY = ey - e.size - 8;
+        this.gEn.fillStyle(0x000000, 0.35);
+        this.gEn.fillRect(barX, barY, barW, barH);
+        this.gEn.fillStyle(0xff6666, 0.65);
+        this.gEn.fillRect(barX, barY, barW * hpPct, barH);
       }
     }
 
