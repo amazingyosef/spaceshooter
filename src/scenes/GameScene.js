@@ -892,18 +892,60 @@ class GameScene extends Phaser.Scene {
         this.gBu.lineStyle(2, 0xffff00, 0.9);
         this.gBu.strokePath();
       } else {
-        const size = 6 * b.size;
-        const bulletColor = b.homing ? 0xaa44ff : b.pierce ? 0xff44aa : 0x00ffff;
+        const isShotgun = b.shotgun;
+        const isRicochet = b.ricochet;
+        const isHoming = b.homing;
+        const size = 6 * b.size * (isShotgun ? 0.65 : 1);
+        const bulletColor = isHoming ? 0xaa44ff : b.pierce ? 0xff44aa : 0x00ffff;
         this.gBu.fillStyle(bulletColor, 0.85);
-        this.gBu.beginPath();
-        this.gBu.arc(bx, by, size, 0, Math.PI * 2);
-        this.gBu.fillPath();
-        if (b.trail && b.trail.length > 1) {
-          this.gBu.lineStyle(size * 0.8, bulletColor, 0.3);
+        if (isShotgun) {
+          this.gBu.fillRect(bx - size, by - size, size * 2, size * 2);
+          this.gBu.lineStyle(1.5, bulletColor, 0.5);
+          this.gBu.strokeRect(bx - size * 1.2, by - size * 1.2, size * 2.4, size * 2.4);
+        } else {
           this.gBu.beginPath();
-          this.gBu.moveTo(b.trail[0].x + shakeX, b.trail[0].y + shakeY);
-          for (const tr of b.trail) this.gBu.lineTo(tr.x + shakeX, tr.y + shakeY);
+          this.gBu.arc(bx, by, size, 0, Math.PI * 2);
+          this.gBu.fillPath();
+        }
+        if (isRicochet) {
+          this.gBu.lineStyle(2, 0xffffff, 0.85);
+          if (isShotgun) {
+            this.gBu.strokeRect(bx - size * 1.3, by - size * 1.3, size * 2.6, size * 2.6);
+          } else {
+            this.gBu.strokeCircle(bx, by, size * 1.4);
+          }
+        }
+        if (isHoming) {
+          this.gBu.lineStyle(2, bulletColor, 0.2);
+          this.gBu.strokeCircle(bx, by, size * 2.1);
+        }
+        if (b.trail && b.trail.length > 1) {
+          const trailPoints = isShotgun ? b.trail.slice(-3) : b.trail;
+          const trailWidth = size * (isShotgun ? 0.45 : 0.8);
+          this.gBu.lineStyle(trailWidth, bulletColor, isShotgun ? 0.25 : 0.3);
+          this.gBu.beginPath();
+          this.gBu.moveTo(trailPoints[0].x + shakeX, trailPoints[0].y + shakeY);
+          for (const tr of trailPoints) this.gBu.lineTo(tr.x + shakeX, tr.y + shakeY);
           this.gBu.strokePath();
+          if (isRicochet) {
+            const sparkPoints = b.trail.slice(-5);
+            this.gBu.lineStyle(1.6, 0xffffff, 0.7);
+            this.gBu.beginPath();
+            this.gBu.moveTo(sparkPoints[0].x + shakeX, sparkPoints[0].y + shakeY);
+            for (const tr of sparkPoints) this.gBu.lineTo(tr.x + shakeX, tr.y + shakeY);
+            this.gBu.strokePath();
+          }
+          if (isHoming) {
+            const spiralPoints = b.trail.slice(-5);
+            for (let i = 0; i < spiralPoints.length; i++) {
+              const tr = spiralPoints[i];
+              const phase = t * 6 + (b.homingPhase || 0) + i * 0.6;
+              const ox = Math.cos(phase) * size * 0.8;
+              const oy = Math.sin(phase) * size * 0.8;
+              this.gBu.fillStyle(bulletColor, 0.25);
+              this.gBu.fillCircle(tr.x + shakeX + ox, tr.y + shakeY + oy, size * 0.25);
+            }
+          }
         }
       }
     }
