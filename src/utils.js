@@ -60,16 +60,24 @@ const angDiff = (a, b) => {
  */
 function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
   const s = 16 * size;
+  const ca = Math.cos(angle);
+  const sa = Math.sin(angle);
+  const rot = (dx, dy) => [x + dx * ca - dy * sa, y + dx * sa + dy * ca];
 
   if (shipType === 'VIPER') {
     // Draw body
     g.fillStyle(0x0a0a2a, 1);
     g.beginPath();
-    g.moveTo(x, y - s);
-    g.lineTo(x + s * 0.5, y + s * 0.3);
-    g.lineTo(x + s * 0.35, y + s * 0.6);
-    g.lineTo(x - s * 0.35, y + s * 0.6);
-    g.lineTo(x - s * 0.5, y + s * 0.3);
+    const [v0x, v0y] = rot(0, -s);
+    g.moveTo(v0x, v0y);
+    const [v1x, v1y] = rot(s * 0.5, s * 0.3);
+    g.lineTo(v1x, v1y);
+    const [v2x, v2y] = rot(s * 0.35, s * 0.6);
+    g.lineTo(v2x, v2y);
+    const [v3x, v3y] = rot(-s * 0.35, s * 0.6);
+    g.lineTo(v3x, v3y);
+    const [v4x, v4y] = rot(-s * 0.5, s * 0.3);
+    g.lineTo(v4x, v4y);
     g.closePath();
     g.fillPath();
 
@@ -80,7 +88,8 @@ function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
     // Draw cockpit
     g.fillStyle(color, 0.9);
     g.beginPath();
-    g.arc(x, y - s * 0.4, 3 * size, 0, Math.PI * 2);
+    const [cx, cy] = rot(0, -s * 0.4);
+    g.arc(cx, cy, 3 * size, 0, Math.PI * 2);
     g.fillPath();
   }
   else if (shipType === 'TANKS') {
@@ -88,7 +97,7 @@ function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
     g.fillStyle(0x0a0a2a, 1);
     g.beginPath();
     for (let i = 0; i < 6; i++) {
-      const ang = (i / 6) * Math.PI * 2 - Math.PI / 2;
+      const ang = angle + (i / 6) * Math.PI * 2 - Math.PI / 2;
       const px = x + Math.cos(ang) * s * 0.7;
       const py = y + Math.sin(ang) * s * 0.7;
       if (i === 0) g.moveTo(px, py);
@@ -105,7 +114,7 @@ function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
     g.fillStyle(color, 0.3);
     g.beginPath();
     for (let i = 0; i < 6; i++) {
-      const ang = (i / 6) * Math.PI * 2;
+      const ang = angle + (i / 6) * Math.PI * 2;
       g.lineTo(x + Math.cos(ang) * s * 0.35, y + Math.sin(ang) * s * 0.35);
     }
     g.closePath();
@@ -115,10 +124,14 @@ function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
     // Draw sharp triangular body
     g.fillStyle(0x0a0a2a, 1);
     g.beginPath();
-    g.moveTo(x, y - s * 1.1);
-    g.lineTo(x + s * 0.35, y + s * 0.5);
-    g.lineTo(x, y + s * 0.3);
-    g.lineTo(x - s * 0.35, y + s * 0.5);
+    const [r0x, r0y] = rot(0, -s * 1.1);
+    g.moveTo(r0x, r0y);
+    const [r1x, r1y] = rot(s * 0.35, s * 0.5);
+    g.lineTo(r1x, r1y);
+    const [r2x, r2y] = rot(0, s * 0.3);
+    g.lineTo(r2x, r2y);
+    const [r3x, r3y] = rot(-s * 0.35, s * 0.5);
+    g.lineTo(r3x, r3y);
     g.closePath();
     g.fillPath();
 
@@ -128,7 +141,20 @@ function drawShipPreview(g, shipType, x, y, angle, color, size = 0.85) {
 
     // Draw cockpit
     g.fillStyle(color, 0.9);
-    g.fillRect(x - s * 0.08, y - s * 0.5, s * 0.16, s * 0.7);
+    const w = s * 0.16;
+    const h = s * 0.7;
+    const rectTop = -s * 0.5;
+    g.beginPath();
+    const [c0x, c0y] = rot(-w * 0.5, rectTop);
+    g.moveTo(c0x, c0y);
+    const [c1x, c1y] = rot(w * 0.5, rectTop);
+    g.lineTo(c1x, c1y);
+    const [c2x, c2y] = rot(w * 0.5, rectTop + h);
+    g.lineTo(c2x, c2y);
+    const [c3x, c3y] = rot(-w * 0.5, rectTop + h);
+    g.lineTo(c3x, c3y);
+    g.closePath();
+    g.fillPath();
   }
 }
 

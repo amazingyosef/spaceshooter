@@ -46,6 +46,7 @@ class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(10);
     
     this.shipGraphics = [];
+    this.shipPreviewData = [];
     SHIPS.forEach((s, i) => {
       const cx = 200 + i * 250;
       const cy = 345;
@@ -117,6 +118,13 @@ class MenuScene extends Phaser.Scene {
       });
       
       this.shipGraphics.push(g);
+      this.shipPreviewData.push({
+        g,
+        ship: s,
+        cx,
+        cy,
+        angle: 0
+      });
     });
     
     // Achievements button
@@ -144,6 +152,23 @@ class MenuScene extends Phaser.Scene {
       fontFamily: '"Courier New"',
       color: '#445566'
     }).setOrigin(0.5).setDepth(10);
+  }
+
+  update(time, delta) {
+    if (!this.shipPreviewData) return;
+    const spinSpeed = 0.00035;
+    this.shipPreviewData.forEach((data, i) => {
+      data.angle += delta * spinSpeed;
+      if (data.angle > Math.PI * 2) data.angle -= Math.PI * 2;
+
+      data.g.clear();
+      if (i === selectedShip) {
+        data.g.lineStyle(3, Phaser.Display.Color.ValueToColor(data.ship.color).color, 0.8);
+        data.g.strokeRect(data.cx - 95, data.cy - 125, 190, 260);
+      }
+
+      drawShipPreview(data.g, data.ship.name, data.cx, data.cy - 40, data.angle, data.ship.color, 1.2);
+    });
   }
 }
 
