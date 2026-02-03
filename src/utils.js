@@ -177,7 +177,19 @@ function drawShipInGame(g, shipType, x, y, angle, color, stage = 0) {
 
     // Stage 2 upgrade: Energy trails
     if (stage >= 2) {
-      g.lineStyle(1.5, 0x00ffff, 0.5);
+      const backX = x + ca * (-s * 0.75);
+      const backY = y + sa * (-s * 0.75);
+      const perpX = -sa;
+      const perpY = ca;
+      const trailLength = s * 0.7;
+      const trailOffset = s * 0.18;
+
+      g.lineStyle(1.5, 0x66ffff, 0.6);
+      g.beginPath();
+      g.moveTo(backX + perpX * trailOffset, backY + perpY * trailOffset);
+      g.lineTo(backX + perpX * (trailOffset * 0.5) - ca * trailLength, backY + perpY * (trailOffset * 0.5) - sa * trailLength);
+      g.moveTo(backX - perpX * trailOffset, backY - perpY * trailOffset);
+      g.lineTo(backX - perpX * (trailOffset * 0.5) - ca * trailLength, backY - perpY * (trailOffset * 0.5) - sa * trailLength);
       g.strokePath();
     }
   }
