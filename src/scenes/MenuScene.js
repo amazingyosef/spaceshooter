@@ -46,6 +46,9 @@ class MenuScene extends Phaser.Scene {
     
     this.shipGraphics = [];
     const shipSpacing = Math.min(250, Math.max(180, (W - 200) / 2));
+    const shipCardWidth = 210;
+    const shipCardHeight = 330;
+    const shipCardTopOffset = 135;
     SHIPS.forEach((s, i) => {
       const cx = W / 2 - shipSpacing + i * shipSpacing;
       const cy = 345;
@@ -54,7 +57,12 @@ class MenuScene extends Phaser.Scene {
       // Selection highlight
       if(i === selectedShip) {
         g.lineStyle(3, Phaser.Display.Color.ValueToColor(s.color).color, 0.8);
-        g.strokeRect(cx - 95, cy - 125, 190, 260);
+        g.strokeRect(
+          cx - shipCardWidth / 2,
+          cy - shipCardTopOffset,
+          shipCardWidth,
+          shipCardHeight
+        );
       }
       
       // Ship preview
@@ -111,7 +119,12 @@ class MenuScene extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(12).setAlpha(0.7);
       
       // Click zone
-      const zone = this.add.zone(cx, cy, 190, 260).setInteractive();
+      const zone = this.add.zone(
+        cx,
+        cy - shipCardTopOffset + shipCardHeight / 2,
+        shipCardWidth,
+        shipCardHeight
+      ).setInteractive();
       zone.on('pointerdown', () => {
         selectedShip = i;
         savePersistent();

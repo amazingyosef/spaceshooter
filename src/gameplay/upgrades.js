@@ -188,11 +188,12 @@ class UpgradeSystem {
    * @returns {boolean} - True if an upgrade was selected
    */
   handleClick(mx, my, upgrades, stats) {
+    const layout = this.scene.getUpgradeCardLayout(upgrades.length);
     for (let i = 0; i < upgrades.length; i++) {
-      const ux = 190 + i * 240;
-      const uy = H / 2 + 60;
-      const uw = 180;
-      const uh = 240;
+      const ux = layout.startX + i * (layout.cardW + layout.gap);
+      const uy = layout.startY;
+      const uw = layout.cardW;
+      const uh = layout.cardH;
 
       if (mx >= ux && mx <= ux + uw && my >= uy && my <= uy + uh) {
         upgrades[i].apply();

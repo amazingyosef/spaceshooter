@@ -442,18 +442,19 @@ class GameScene extends Phaser.Scene {
     }
     this.upTexts = [];
 
+    const layout = this.getUpgradeCardLayout(this.upgrades.length);
     for (let i = 0; i < this.upgrades.length; i++) {
-      const ux = 190 + i * 240;
-      const uy = H / 2 + 60;
+      const ux = layout.startX + i * (layout.cardW + layout.gap);
+      const uy = layout.startY;
 
-      const nameText = this.add.text(ux + 90, uy + 50, this.upgrades[i].name, {
+      const nameText = this.add.text(ux + layout.cardW / 2, uy + 50, this.upgrades[i].name, {
         fontSize: '16px',
         fontFamily: '"Courier New"',
         color: '#ffffff',
         fontStyle: 'bold'
       }).setOrigin(0.5).setDepth(36).setAlpha(0);
 
-      const descText = this.add.text(ux + 90, uy + 85, this.upgrades[i].desc, {
+      const descText = this.add.text(ux + layout.cardW / 2, uy + 85, this.upgrades[i].desc, {
         fontSize: '12px',
         fontFamily: '"Courier New"',
         color: '#aaccff',
@@ -461,7 +462,7 @@ class GameScene extends Phaser.Scene {
         align: 'center'
       }).setOrigin(0.5).setDepth(36).setAlpha(0);
 
-      const hintText = this.add.text(ux + 90, uy + 200, '[ CLICK ]', {
+      const hintText = this.add.text(ux + layout.cardW / 2, uy + 200, '[ CLICK ]', {
         fontSize: '10px',
         fontFamily: '"Courier New"',
         color: '#00ffff'
@@ -1120,16 +1121,17 @@ class GameScene extends Phaser.Scene {
       this.gUp.fillStyle(0x000000, overlayAlpha);
       this.gUp.fillRect(0, 0, W, H);
 
+      const layout = this.getUpgradeCardLayout(this.upgrades.length);
       for (let i = 0; i < this.upgrades.length; i++) {
         const cardDelay = i * 0.12;
         const cardAlpha = Math.min(1, Math.max(0, (this.upgradeAnimT - cardDelay) * 4));
 
         if (cardAlpha <= 0) continue;
 
-        const ux = 190 + i * 240;
-        const uy = H / 2 + 60;
-        const cardW = 180;
-        const cardH = 240;
+        const ux = layout.startX + i * (layout.cardW + layout.gap);
+        const uy = layout.startY;
+        const cardW = layout.cardW;
+        const cardH = layout.cardH;
 
         this.gUp.fillStyle(0x000000, 0.5 * cardAlpha);
         this.gUp.fillRect(ux + 4, uy + 4, cardW, cardH);
@@ -1162,6 +1164,17 @@ class GameScene extends Phaser.Scene {
         this.gUp.strokePath();
       }
     }
+  }
+
+  getUpgradeCardLayout(cardCount = 3) {
+    const cardW = 180;
+    const cardH = 240;
+    const gap = 60;
+    const totalW = cardCount * cardW + (cardCount - 1) * gap;
+    const startX = (W - totalW) / 2;
+    const startY = H / 2 + 60;
+
+    return { startX, startY, cardW, cardH, gap };
   }
 
   /**
