@@ -169,7 +169,8 @@ class GameScene extends Phaser.Scene {
     }
 
     // Delta time management
-    let dt = Math.min(delta / 1000, 0.033);
+    const dtS = Math.min(delta / 1000, 0.033);
+    let dt = dtS;
     if (this.slowT > 0) {
       this.slowT -= dt;
       dt *= 0.4;
@@ -178,7 +179,6 @@ class GameScene extends Phaser.Scene {
       this.bossKillSlowT -= dt;
       dt *= 0.4;
     }
-    const dtS = dt;
 
     // Muzzle flash timer
     if (this.muzzleT > 0) this.muzzleT -= dt;
@@ -219,7 +219,7 @@ class GameScene extends Phaser.Scene {
 
       // Update combo timer
       if (this.combo > 0) {
-        this.comboTimer -= dt;
+        this.comboTimer -= dtS;
         if (this.comboTimer <= 0) {
           this.combo = 0;
         }
@@ -297,6 +297,14 @@ class GameScene extends Phaser.Scene {
           sfx('heartbeat');
           this.heartbeatTimer = 0.8;
         }
+      }
+    }
+
+    // Notification text timer
+    if (this.notifTimer > 0) {
+      this.notifTimer -= dtS;
+      if (this.notifTimer <= 0 && this.notifText) {
+        this.notifText.setAlpha(0);
       }
     }
 
@@ -483,6 +491,9 @@ class GameScene extends Phaser.Scene {
       this.bossesDefeated++;
       this.currentBoss = null;
       if (this.bossesDefeated === 1) unlockAchievement('boss1');
+    }
+    if (e === this.currentBoss) {
+      this.currentBoss = null;
     }
 
     // Update score with combo multiplier
@@ -982,8 +993,8 @@ class GameScene extends Phaser.Scene {
     this.txtWave.setText(`WAVE: ${this.wave}`);
 
     let hpCol = '#ff4444';
-    if (this.p.hp / this.p.maxHp > 0.6) hpCol = '#44ff44';
-    else if (this.p.hp / this.p.maxHp > 0.3) hpCol = '#ffaa00';
+    if (this.p.hp / this.p.maxHp > 0.5) hpCol = '#44ff44';
+    else if (this.p.hp / this.p.maxHp > 0.25) hpCol = '#ffaa00';
     this.txtHp.setText(`HP: ${this.p.hp | 0}/${this.p.maxHp | 0}  SHIELD: ${this.p.shield | 0}`).setColor(hpCol);
     this.txtEnemies.setText(`ENEMIES: ${this.enemySystem.enemies.length}`);
 
@@ -1103,13 +1114,6 @@ class GameScene extends Phaser.Scene {
     }
 
     // Notification text
-    if (this.notifTimer > 0) {
-      this.notifTimer -= 0.016;
-      if (this.notifTimer <= 0 && this.notifText) {
-        this.notifText.setAlpha(0);
-      }
-    }
-
     // Upgrade screen
     if (this.upgradeMode) {
       const overlayAlpha = Math.min(0.85, this.upgradeAnimT * 2.5);

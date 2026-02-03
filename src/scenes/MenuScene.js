@@ -8,9 +8,8 @@ class MenuScene extends Phaser.Scene {
     this.gBg = this.add.graphics();
     this.gBg.lineStyle(1, 0x00ffff, 0.15);
     for(let x = 0; x <= W; x += 40) {
-      this.gBg.lineTo(x, 0);
+      this.gBg.moveTo(x, 0);
       this.gBg.lineTo(x, H);
-      this.gBg.moveTo(x + 40, 0);
     }
     for(let y = 0; y <= H; y += 40) {
       this.gBg.moveTo(0, y);
@@ -46,8 +45,9 @@ class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(10);
     
     this.shipGraphics = [];
+    const shipSpacing = Math.min(250, Math.max(180, (W - 200) / 2));
     SHIPS.forEach((s, i) => {
-      const cx = 200 + i * 250;
+      const cx = W / 2 - shipSpacing + i * shipSpacing;
       const cy = 345;
       const g = this.add.graphics().setDepth(11);
       
@@ -77,8 +77,10 @@ class MenuScene extends Phaser.Scene {
       // Stats bars
       const stats = ['firepower', 'speed', 'defense', 'mobility'];
       const statNames = ['FIRE', 'SPEED', 'DEF', 'MOB'];
+      const statHeight = 14;
+      const statStartY = cy + 95;
       stats.forEach((stat, si) => {
-        const sy = cy + 95 + si * 16;
+        const sy = statStartY + si * statHeight;
         const val = s.stats[stat];
         
         this.add.text(cx - 75, sy, statNames[si], {
@@ -126,6 +128,8 @@ class MenuScene extends Phaser.Scene {
       color: '#ffaa00'
     }).setOrigin(0.5).setDepth(12).setInteractive();
     achBtn.on('pointerdown', () => this.scene.start('Achievements'));
+    achBtn.on('pointerover', () => achBtn.setColor('#ffcc44'));
+    achBtn.on('pointerout', () => achBtn.setColor('#ffaa00'));
     
     // Start button
     const startBtn = this.add.text(W / 2 + 110, H - 80, '▶ START GAME', {
@@ -137,6 +141,8 @@ class MenuScene extends Phaser.Scene {
       if(!audioCtx) initAudio();
       this.scene.start('Game');
     });
+    startBtn.on('pointerover', () => startBtn.setColor('#66ff66'));
+    startBtn.on('pointerout', () => startBtn.setColor('#00ff00'));
     
     // Version
     this.add.text(W / 2, H - 30, 'v2.0 Enhanced | Total Enemies Killed: ' + totalEnemiesKilled, {
