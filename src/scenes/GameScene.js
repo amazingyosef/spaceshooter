@@ -433,6 +433,13 @@ class GameScene extends Phaser.Scene {
     this.upgradeAnimT = 0;
     this.upgrades = this.upgradeSystem.getPool(this.w, this.p, this.stats);
 
+    // Edge case: if no upgrades are available, skip upgrade screen
+    if (this.upgrades.length === 0) {
+      this.upgradeMode = false;
+      this.nextWave();
+      return;
+    }
+
     this.txtUpTitle.setVisible(true);
     this.txtUpSub.setVisible(true);
 
