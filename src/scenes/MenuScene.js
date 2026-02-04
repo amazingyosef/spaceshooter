@@ -158,7 +158,51 @@ class MenuScene extends Phaser.Scene {
     });
     startBtn.on('pointerover', () => startBtn.setColor('#66ff66'));
     startBtn.on('pointerout', () => startBtn.setColor('#00ff00'));
-    
+
+    // Upgrade stacking toggle
+    const toggleY = H - 50;
+    const toggleX = W / 2;
+
+    // Checkbox
+    const checkboxSize = 14;
+    const checkboxG = this.add.graphics().setDepth(12);
+    checkboxG.lineStyle(2, 0x00ffff, 0.8);
+    checkboxG.strokeRect(toggleX - 120, toggleY - checkboxSize / 2, checkboxSize, checkboxSize);
+
+    if (upgradeStackingEnabled) {
+      checkboxG.fillStyle(0x00ffff, 0.8);
+      checkboxG.fillRect(toggleX - 120 + 3, toggleY - checkboxSize / 2 + 3, checkboxSize - 6, checkboxSize - 6);
+    }
+
+    // Toggle label
+    const toggleLabel = this.add.text(toggleX - 100, toggleY, 'Upgrade Stacking (Upgrades persist between rounds)', {
+      fontSize: '12px',
+      fontFamily: '"Courier New"',
+      color: '#aabbcc'
+    }).setDepth(12).setOrigin(0, 0.5);
+
+    // Click zone for toggle
+    const toggleZone = this.add.zone(
+      toggleX - 120 + checkboxSize / 2,
+      toggleY,
+      checkboxSize + 300,
+      checkboxSize + 10
+    ).setOrigin(0, 0.5).setInteractive();
+
+    toggleZone.on('pointerdown', () => {
+      upgradeStackingEnabled = !upgradeStackingEnabled;
+      savePersistent();
+      this.scene.restart();
+    });
+
+    toggleZone.on('pointerover', () => {
+      toggleLabel.setColor('#ffffff');
+    });
+
+    toggleZone.on('pointerout', () => {
+      toggleLabel.setColor('#aabbcc');
+    });
+
     // Version
     this.add.text(W / 2, H - 30, 'v2.0 Enhanced | Total Enemies Killed: ' + totalEnemiesKilled, {
       fontSize: '10px',

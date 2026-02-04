@@ -38,6 +38,32 @@ class GameScene extends Phaser.Scene {
     this.p = this.playerSystem.init(selectedShip);
     this.w = this.weaponSystem.init(selectedShip);
 
+    // Store initial states for upgrade reset (when stacking is disabled)
+    this.initialPlayerState = {
+      maxHp: this.p.maxHp,
+      speed: this.p.speed,
+      maxShield: this.p.maxShield,
+      hasTeleport: this.p.hasTeleport
+    };
+
+    this.initialWeaponState = {
+      type: this.w.type,
+      rate: this.w.rate,
+      pierce: this.w.pierce,
+      homing: this.w.homing,
+      mega: this.w.mega,
+      ricochet: this.w.ricochet,
+      ricochetsLeft: this.w.ricochetsLeft,
+      shotgun: this.w.shotgun,
+      bulletSize: this.w.bulletSize
+    };
+
+    this.initialStatsState = {
+      regenRate: 0,
+      dashCdDur: SHIPS[selectedShip].dashCD,
+      hasDashUpgrade: false
+    };
+
     // Game state
     this.wave = 0;
     this.score = 0;
@@ -329,6 +355,35 @@ class GameScene extends Phaser.Scene {
       unlockAchievement('noDamageWave');
     }
     this.stats.waveDamageTaken = 0;
+
+    // Reset upgrades if stacking is disabled (after first wave)
+    if (!upgradeStackingEnabled && this.wave > 0) {
+      // Reset player stats to initial state
+      this.p.maxHp = this.initialPlayerState.maxHp;
+      this.p.speed = this.initialPlayerState.speed;
+      this.p.maxShield = this.initialPlayerState.maxShield;
+      this.p.hasTeleport = this.initialPlayerState.hasTeleport;
+
+      // Clamp current HP to new max (don't remove health, just cap it)
+      this.p.hp = Math.min(this.p.hp, this.p.maxHp);
+      this.p.shield = Math.min(this.p.shield, this.p.maxShield);
+
+      // Reset weapon stats to initial state
+      this.w.type = this.initialWeaponState.type;
+      this.w.rate = this.initialWeaponState.rate;
+      this.w.pierce = this.initialWeaponState.pierce;
+      this.w.homing = this.initialWeaponState.homing;
+      this.w.mega = this.initialWeaponState.mega;
+      this.w.ricochet = this.initialWeaponState.ricochet;
+      this.w.ricochetsLeft = this.initialWeaponState.ricochetsLeft;
+      this.w.shotgun = this.initialWeaponState.shotgun;
+      this.w.bulletSize = this.initialWeaponState.bulletSize;
+
+      // Reset stats to initial state
+      this.stats.regenRate = this.initialStatsState.regenRate;
+      this.stats.dashCdDur = this.initialStatsState.dashCdDur;
+      this.stats.hasDashUpgrade = this.initialStatsState.hasDashUpgrade;
+    }
 
     this.wave++;
     this.waveComplete = false;

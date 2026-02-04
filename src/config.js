@@ -21,6 +21,7 @@ let lastScore = 0;
 let lastWave = 0;
 let lastStats = {};
 let selectedShip = 0;
+let upgradeStackingEnabled = true;  // Toggle for upgrade persistence between rounds
 
 // ============================================================
 // PERSISTENT UPGRADES
