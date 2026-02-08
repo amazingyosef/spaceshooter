@@ -21,6 +21,66 @@ let lastScore = 0;
 let lastWave = 0;
 let lastStats = {};
 let selectedShip = 0;
+let selectedDifficulty = 1; // 0=Easy, 1=Medium, 2=Hard, 3=Insane
+
+// ============================================================
+// DIFFICULTY MODES
+// Each mode scales enemy strength and volume
+// ============================================================
+const DIFFICULTY_MODES = [
+  {
+    name: 'EASY',
+    color: '#44ff44',
+    colorHex: 0x44ff44,
+    desc: 'Relaxed — fewer & weaker foes',
+    hpMult: 0.7,
+    speedMult: 0.85,
+    countMult: 0.7,
+    damageMult: 0.7,
+    scoreMult: 0.75,
+    bossHpMult: 0.7,
+    waveShift: -2
+  },
+  {
+    name: 'MEDIUM',
+    color: '#ffaa00',
+    colorHex: 0xffaa00,
+    desc: 'Standard — the default experience',
+    hpMult: 1.0,
+    speedMult: 1.0,
+    countMult: 1.0,
+    damageMult: 1.0,
+    scoreMult: 1.0,
+    bossHpMult: 1.0,
+    waveShift: 0
+  },
+  {
+    name: 'HARD',
+    color: '#ff4444',
+    colorHex: 0xff4444,
+    desc: 'Punishing — stronger & more numerous',
+    hpMult: 1.4,
+    speedMult: 1.15,
+    countMult: 1.5,
+    damageMult: 1.3,
+    scoreMult: 1.5,
+    bossHpMult: 1.4,
+    waveShift: 2
+  },
+  {
+    name: 'INSANE',
+    color: '#ff00ff',
+    colorHex: 0xff00ff,
+    desc: 'Nightmare — overwhelming hordes',
+    hpMult: 2.0,
+    speedMult: 1.3,
+    countMult: 2.0,
+    damageMult: 1.6,
+    scoreMult: 2.5,
+    bossHpMult: 2.0,
+    waveShift: 4
+  }
+];
 
 // ============================================================
 // PERSISTENT UPGRADES

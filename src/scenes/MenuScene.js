@@ -136,6 +136,51 @@ class MenuScene extends Phaser.Scene {
       this.shipGraphics.push(g);
     });
     
+    // Difficulty selection
+    this.add.text(W / 2, 550, 'DIFFICULTY', {
+      fontSize: '13px',
+      fontFamily: '"Courier New"',
+      color: '#667788'
+    }).setOrigin(0.5).setDepth(10);
+
+    const diffSpacing = 120;
+    const diffStartX = W / 2 - diffSpacing * 1.5;
+    DIFFICULTY_MODES.forEach((d, i) => {
+      const dx = diffStartX + i * diffSpacing;
+      const isSelected = (i === selectedDifficulty);
+
+      if (isSelected) {
+        const bg = this.add.graphics().setDepth(11);
+        bg.lineStyle(2, d.colorHex, 0.8);
+        bg.strokeRoundedRect(dx - 44, 562, 88, 26, 4);
+        bg.fillStyle(d.colorHex, 0.1);
+        bg.fillRoundedRect(dx - 44, 562, 88, 26, 4);
+      }
+
+      const txt = this.add.text(dx, 575, d.name, {
+        fontSize: isSelected ? '14px' : '12px',
+        fontFamily: '"Courier New"',
+        color: isSelected ? d.color : '#556677',
+        fontStyle: isSelected ? 'bold' : 'normal'
+      }).setOrigin(0.5).setDepth(12).setInteractive();
+
+      txt.on('pointerdown', () => {
+        selectedDifficulty = i;
+        savePersistent();
+        this.scene.restart();
+      });
+      txt.on('pointerover', () => { if (i !== selectedDifficulty) txt.setColor(d.color); });
+      txt.on('pointerout', () => { if (i !== selectedDifficulty) txt.setColor('#556677'); });
+    });
+
+    // Selected difficulty description
+    const selDiff = DIFFICULTY_MODES[selectedDifficulty];
+    this.add.text(W / 2, 598, selDiff.desc, {
+      fontSize: '10px',
+      fontFamily: '"Courier New"',
+      color: selDiff.color
+    }).setOrigin(0.5).setDepth(10).setAlpha(0.7);
+
     // Achievements button
     const achBtn = this.add.text(W / 2 - 110, H - 80, '🏆 ACHIEVEMENTS', {
       fontSize: '14px',

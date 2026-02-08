@@ -34,6 +34,7 @@ function loadPersistent() {
       totalEnemiesKilled = obj.totalEnemiesKilled || 0;
       highScore = obj.highScore || 0;
       selectedShip = obj.selectedShip || 0;
+      selectedDifficulty = obj.selectedDifficulty || 1;
 
       // Initialize achievements with default values
       Object.keys(ACHIEVEMENTS).forEach(key => {
@@ -56,7 +57,8 @@ function savePersistent() {
       achievements,
       totalEnemiesKilled,
       highScore,
-      selectedShip
+      selectedShip,
+      selectedDifficulty
     }));
   } catch (e) {
     console.error('Save error:', e);

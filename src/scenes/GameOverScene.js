@@ -5,7 +5,10 @@ class GameOverScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#000000');
     
     this.add.text(W/2,120,'GAME OVER',{fontSize:'56px',fontFamily:'"Courier New"',color:'#ff4444'}).setOrigin(0.5);
-    
+
+    const diff = DIFFICULTY_MODES[selectedDifficulty];
+    this.add.text(W/2,175,diff.name,{fontSize:'14px',fontFamily:'"Courier New"',color:diff.color,fontStyle:'bold'}).setOrigin(0.5);
+
     this.add.text(W/2,220,'SCORE',{fontSize:'16px',fontFamily:'"Courier New"',color:'#66ffff'}).setOrigin(0.5);
     this.add.text(W/2,250,`${lastScore}`,{fontSize:'48px',fontFamily:'"Courier New"',color:'#00ffff'}).setOrigin(0.5);
     

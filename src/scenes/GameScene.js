@@ -253,7 +253,8 @@ class GameScene extends Phaser.Scene {
       this.weaponSystem.updateBullets(dtS, this.enemySystem.enemies);
 
       // Update enemy bullets
-      const bulletDmg = this.weaponSystem.updateEnemyBullets(dt, this.p);
+      const rawBulletDmg = this.weaponSystem.updateEnemyBullets(dt, this.p);
+      const bulletDmg = Math.floor(rawBulletDmg * DIFFICULTY_MODES[selectedDifficulty].damageMult);
       if (bulletDmg > 0) {
         if (this.playerSystem.takeDamage(bulletDmg)) {
           this.die();
@@ -355,6 +356,10 @@ class GameScene extends Phaser.Scene {
       this.effectsSystem.burst(this.p.x, this.p.y, SHIPS[this.p.shipIdx].color, 30, 150);
     }
 
+    const diff = DIFFICULTY_MODES[selectedDifficulty];
+    // Effective wave for enemy composition (shifted by difficulty)
+    const ew = Math.max(1, this.wave + diff.waveShift);
+
     this.isBossWave = (this.wave % 5 === 0);
     this.isMiniBossWave = (this.wave % 3 === 0 && !this.isBossWave);
     this.spawnQ = [];
@@ -362,30 +367,38 @@ class GameScene extends Phaser.Scene {
     if (this.isBossWave) {
       const bossType = ['boss', 'boss2', 'boss3'][randI(0, 2)];
       this.spawnQ.push(bossType);
+      // Harder difficulties add support enemies alongside the boss
+      if (diff.countMult > 1) {
+        const supportCount = Math.floor(4 * (diff.countMult - 1) / 0.5) + 2;
+        for (let i = 0; i < supportCount; i++) {
+          const r = Math.random();
+          this.spawnQ.push(r < 0.4 ? 'drone' : r < 0.7 ? 'scout' : 'tank');
+        }
+      }
       this.currentBoss = null;
       this.spawnT = 0;
       sfx('bossBegin');
       this.showWaveMsg('— BOSS —', '#ff4444', 1.4);
     } else if (this.isMiniBossWave) {
       this.spawnQ.push('miniboss');
-      const extras = Math.min(5 + this.wave, 20) | 0;
+      const extras = Math.min(5 + this.wave, 20) * diff.countMult | 0;
       for (let i = 0; i < extras; i++) {
         const r = Math.random();
-        if (this.wave <= 4) this.spawnQ.push('drone');
-        else if (this.wave <= 7) this.spawnQ.push(r < 0.5 ? 'drone' : 'scout');
+        if (ew <= 4) this.spawnQ.push('drone');
+        else if (ew <= 7) this.spawnQ.push(r < 0.5 ? 'drone' : 'scout');
         else this.spawnQ.push(r < 0.3 ? 'drone' : r < 0.6 ? 'scout' : 'tank');
       }
       this.spawnT = 0;
       this.showWaveMsg('⚡ MINI-BOSS ⚡', '#ffaa00', 1.2);
     } else {
       const baseCount = 6 + this.wave * 2.5;
-      const count = Math.min(baseCount, 80) | 0;
+      const count = Math.min(baseCount * diff.countMult, 120) | 0;
       for (let i = 0; i < count; i++) {
         const r = Math.random();
-        if (this.wave <= 2) this.spawnQ.push('drone');
-        else if (this.wave <= 4) this.spawnQ.push(r < 0.6 ? 'drone' : 'scout');
-        else if (this.wave <= 7) this.spawnQ.push(r < 0.30 ? 'drone' : r < 0.55 ? 'scout' : r < 0.70 ? 'tank' : r < 0.85 ? 'healer' : 'bomber');
-        else if (this.wave <= 10) this.spawnQ.push(r < 0.20 ? 'drone' : r < 0.40 ? 'scout' : r < 0.55 ? 'tank' : r < 0.65 ? 'shieldE' : r < 0.75 ? 'sniper' : r < 0.85 ? 'healer' : r < 0.92 ? 'spawner' : 'teleporter');
+        if (ew <= 2) this.spawnQ.push('drone');
+        else if (ew <= 4) this.spawnQ.push(r < 0.6 ? 'drone' : 'scout');
+        else if (ew <= 7) this.spawnQ.push(r < 0.30 ? 'drone' : r < 0.55 ? 'scout' : r < 0.70 ? 'tank' : r < 0.85 ? 'healer' : 'bomber');
+        else if (ew <= 10) this.spawnQ.push(r < 0.20 ? 'drone' : r < 0.40 ? 'scout' : r < 0.55 ? 'tank' : r < 0.65 ? 'shieldE' : r < 0.75 ? 'sniper' : r < 0.85 ? 'healer' : r < 0.92 ? 'spawner' : 'teleporter');
         else this.spawnQ.push(r < 0.12 ? 'drone' : r < 0.28 ? 'scout' : r < 0.43 ? 'tank' : r < 0.55 ? 'shieldE' : r < 0.65 ? 'sniper' : r < 0.74 ? 'swarm' : r < 0.82 ? 'healer' : r < 0.88 ? 'spawner' : r < 0.93 ? 'bomber' : r < 0.96 ? 'teleporter' : r < 0.98 ? 'kamikaze' : 'artillery');
       }
       this.spawnT = 0;
