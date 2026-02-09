@@ -1,6 +1,6 @@
 /**
  * WEAPON SYSTEM
- * Handles weapon firing, bullet updates, and special weapons (laser, shotgun).
+ * Handles weapon firing, bullet updates, and special weapons (shotgun).
  *
  * For a young learner: This is where you can change weapon damage, fire rate,
  * bullet speed, and how special weapons work!
@@ -15,8 +15,6 @@ class WeaponSystem {
     this.gravityWells = [];
     this.lastFired = 0;
     this.megaCounter = 0;
-    this.laserActive = false;
-    this.laserCharge = 0;
   }
 
   /**
@@ -39,7 +37,6 @@ class WeaponSystem {
       ricochet: false,
       ricochetsLeft: 2,
       shotgun: false,
-      laser: false,
       bulletSize: 1.0,
       totalDamageDealt: 0,
       bulletsExpired: 0
@@ -83,8 +80,6 @@ class WeaponSystem {
     // Handle different weapon types
     if (w.shotgun) {
       this.fireShotgun(player, ang, spd, dmg);
-    } else if (w.laser) {
-      this.activateLaser();
     } else {
       this.fireStandard(player, ang, spd, dmg);
     }
@@ -111,15 +106,6 @@ class WeaponSystem {
       );
     }
     sfx('shotgun');
-  }
-
-  /**
-   * Activate laser beam
-   */
-  activateLaser() {
-    this.laserActive = true;
-    this.laserCharge = 0;
-    sfx('laser');
   }
 
   /**
@@ -303,47 +289,6 @@ class WeaponSystem {
     }
 
     return nearest;
-  }
-
-  /**
-   * Update laser beam damage
-   * @param {number} dt - Delta time
-   * @param {object} player - Player object
-   * @param {array} enemies - Enemy array
-   */
-  updateLaser(dt, player, enemies) {
-    if (!this.laserActive) return;
-
-    this.laserCharge += dt;
-
-    if (this.laserCharge < 0.1) return;
-
-    const range = 600;
-    const x1 = player.x;
-    const y1 = player.y;
-    const x2 = player.x + Math.cos(player.angle) * range;
-    const y2 = player.y + Math.sin(player.angle) * range;
-
-    const dmg = (this.weapon.dmg * 0.5 + this.scene.wave) * dt * 10;
-
-    for (const e of enemies) {
-      if (!e.alive) continue;
-      const d = this.pointLineDistance(e.x, e.y, x1, y1, x2, y2);
-      if (d < e.size + 5) {
-        e.hp -= dmg;
-        if (Math.random() < 0.15) {
-          this.scene.burst(e.x, e.y, e.color, 2, 40);
-        }
-      }
-    }
-  }
-
-  /**
-   * Deactivate laser
-   */
-  deactivateLaser() {
-    this.laserActive = false;
-    this.laserCharge = 0;
   }
 
   /**

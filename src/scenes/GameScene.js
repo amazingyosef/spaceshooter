@@ -185,7 +185,6 @@ class GameScene extends Phaser.Scene {
 
     if (!this.upgradeMode) {
       // Update systems
-      this.weaponSystem.updateLaser(dt, this.p, this.enemySystem.enemies);
       this.weaponSystem.updateGravityWells(dt, this.enemySystem.enemies);
 
       // Player movement
@@ -213,8 +212,6 @@ class GameScene extends Phaser.Scene {
         if (this.weaponSystem.fire(time, this.p, this.wave, rapidStrike, slowActive)) {
           this.muzzleT = 0.08;
         }
-      } else {
-        this.weaponSystem.deactivateLaser();
       }
 
       // Update combo timer
@@ -812,27 +809,6 @@ class GameScene extends Phaser.Scene {
       this.gBu.strokePath();
     }
 
-    // Draw laser beam
-    if (this.weaponSystem.laserActive && this.weaponSystem.laserCharge >= 0.1) {
-      const range = 600;
-      const px = this.p.x + shakeX;
-      const py = this.p.y + shakeY;
-      const x2 = px + Math.cos(this.p.angle) * range;
-      const y2 = py + Math.sin(this.p.angle) * range;
-
-      this.gBu.lineStyle(8, 0xff0088, 0.3);
-      this.gBu.beginPath();
-      this.gBu.moveTo(px, py);
-      this.gBu.lineTo(x2, y2);
-      this.gBu.strokePath();
-
-      this.gBu.lineStyle(3, 0xff44ff, 0.9);
-      this.gBu.beginPath();
-      this.gBu.moveTo(px, py);
-      this.gBu.lineTo(x2, y2);
-      this.gBu.strokePath();
-    }
-
     // Draw particles
     for (const p of this.effectsSystem.particles) {
       const a = Math.min(1, p.life * 3);
@@ -899,7 +875,6 @@ class GameScene extends Phaser.Scene {
     // Weapon type display
     let weaponName = this.w.type.toUpperCase();
     if (this.w.shotgun) weaponName = 'SHOTGUN';
-    if (this.w.laser) weaponName = 'LASER';
     const extras = [];
     if (this.w.pierce) extras.push('PIERCE');
     if (this.w.homing) extras.push('HOMING');
@@ -1085,7 +1060,6 @@ class GameScene extends Phaser.Scene {
       'QUAD SHOT': 0x00ffff,
       'RICOCHET': 0xffaa00,
       'SHOTGUN BLAST': 0xff6600,
-      'LASER BEAM': 0xff00ff,
       'RAPID FIRE': 0xffff00,
       'PIERCING': 0xff44aa,
       'HOMING': 0xaa44ff,
