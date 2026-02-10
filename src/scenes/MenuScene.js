@@ -62,7 +62,7 @@ class MenuScene extends Phaser.Scene {
       letterSpacing: 10
     }).setOrigin(0.5).setDepth(10);
 
-    this.add.text(W / 2, 94, 'ENHANCED EDITION', {
+    this.add.text(W / 2, 94, 'BY YOSEF FELLIG', {
       fontSize: '13px',
       fontFamily: '"Courier New"',
       color: '#00ffff',
