@@ -256,6 +256,15 @@ class EnemySystem {
     }
 
     enemy.hitFlash = 0;
+
+    // Apply difficulty scaling
+    const diff = DIFFICULTY_MODES[selectedDifficulty];
+    const isBossType = (type === 'boss' || type === 'boss2' || type === 'boss3' || type === 'miniboss');
+    enemy.hp = Math.floor(enemy.hp * (isBossType ? diff.bossHpMult : diff.hpMult));
+    enemy.maxHp = enemy.hp;
+    enemy.speed = enemy.speed * diff.speedMult;
+    enemy.pts = Math.floor(enemy.pts * diff.scoreMult);
+
     if (type === 'boss' || type === 'boss2' || type === 'boss3') {
       this.scene.currentBoss = enemy;
     }
@@ -723,7 +732,7 @@ class EnemySystem {
         if (e.type === 'boss' || e.type === 'boss2' || e.type === 'boss3') dmg = 15;
         if (e.type === 'miniboss') dmg = 12;
 
-        totalDamage += dmg;
+        totalDamage += Math.floor(dmg * DIFFICULTY_MODES[selectedDifficulty].damageMult);
       }
     }
 
